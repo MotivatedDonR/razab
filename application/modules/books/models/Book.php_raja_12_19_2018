@@ -1,0 +1,284 @@
+<?php
+defined('BASEPATH') OR exit('No direct script access allowed');
+
+class Book extends CI_Model {
+    private $table = 'booking_person';
+    public function __construct() {
+        parent::__construct();
+
+    }
+
+    public function get_queue($login_id)
+    {           
+        $this->db->select('*');
+        $this->db->from('booking_person');
+        $this->db->where('status', 0);
+        $this->db->where('queue_status', 1);
+        $this->db->where('user_id', $login_id);
+        $this->db->where('appointment_method', 0);
+        $query = $this->db->get();
+        return $query->result();
+    }
+
+    public function get_all_queue($ad_id)
+    {           
+        $this->db->select('*');
+        $this->db->from('booking_person');
+        $this->db->where('queue_status', 0);
+        $this->db->where('status', 0);
+        $this->db->where('ad_id', $ad_id);
+        $this->db->where('appointment_method', 0);
+        $this->db->where('client_confirmation_status',0);
+        $query = $this->db->get();
+        return $query->result();
+    }
+
+    public function get_suscribe($login_id)
+    {   
+        
+        $this->db->select('*');
+        $this->db->from('booking_person');
+        $this->db->where('status', 0);
+        $this->db->where('user_id', $login_id);
+        $this->db->where('appointment_method', 1);
+        $this->db->where('client_confirmation_status',0);
+        $query = $this->db->get();
+        return $query->result();
+    }
+
+    public function get_completed($login_id)
+    {   
+        
+        $this->db->select('*');
+        $this->db->from('booking_person');
+        $this->db->where('user_id', $login_id);
+        $this->db->where('status', 1);
+        $this->db->where('client_confirmation_status',0);
+        $query = $this->db->get();
+        return $query->result();
+    }
+
+    public function add_appointment_via_que($params){
+        $params = array_filter($params,'strlen');
+        $params ['created'] = date('Y-m-d H:i:s');
+        $params ['modified'] = date('Y-m-d H:i:s');
+        $this->db->insert($this->table,$params);
+		return $this->db->insert_id();
+    }
+    
+    public function add_appointment_via_payment($params){
+        $params = array_filter($params,'strlen');
+        $params ['created'] = date('Y-m-d H:i:s');
+        $params ['modified'] = date('Y-m-d H:i:s');
+        $this->db->insert('temp_booking',$params);
+
+        $insert_id = $this->db->insert_id();
+        if($insert_id){
+            return  $insert_id;
+        }
+        
+		//$last_id=return $this->db->insert_id();
+    }
+
+    public function fetch_temp_booking($last_id)
+    {   
+        
+        $this->db->select('*');
+        $this->db->from('temp_booking');
+        $this->db->where('id', $last_id);
+        $query = $this->db->get();
+        return $query->row();
+    }
+
+
+    public function delete_temp_booking($last_id){
+        return $this->db->delete('temp_booking',array('id'=>$last_id));
+    }
+
+
+    public function get_guest_queue($login_id)
+    {           
+        $this->db->select('*');
+        $this->db->from('booking_person');
+        $this->db->where('status', 0);
+        $this->db->where('user_id', $login_id);
+        $this->db->where('queue_status', 1);
+        $this->db->where('client_confirmation_status',0);
+        $this->db->where('appointment_method', 0);
+        $query = $this->db->get();
+        return $query->num_rows();
+    }
+
+    public function get_guest_suscribe($login_id)
+    {           
+        $this->db->select('*');
+        $this->db->from('live_queue');
+       // $this->db->where('status', 0);
+        $this->db->where('user_id', $login_id);
+        //$this->db->where('appointment_method', 1);
+        //$this->db->where('client_confirmation_status',0);
+        $query = $this->db->get();
+        return $query->num_rows();
+    }
+
+    public function get_guest_complete($login_id)
+    {           
+        $this->db->select('*');
+        $this->db->from('booking_person');
+        //$this->db->where('status', 1);
+        $this->db->where('user_id', $login_id);
+        $this->db->where('appointment_method', 1);
+        $this->db->where('client_confirmation_status',0);
+        $query = $this->db->get();
+        return $query->num_rows();
+    }
+
+    public function get_users($login_id)
+    {   
+        
+        $this->db->select('*');
+        $this->db->from('users');
+        $this->db->where('id', $login_id);
+        $query = $this->db->get();
+        return $query->row();
+    }
+
+    public function fetch_add($client_id,$ad_id)
+    {   
+        
+        $this->db->select('*');
+        $this->db->from('ads');
+        $this->db->where('user_id', $client_id);
+        $this->db->where('id', $ad_id);
+        $query = $this->db->get();
+        return $query->row();
+    }
+
+    public function get_booking_person($booking_person_id)
+    {           
+        $this->db->select('*');
+        $this->db->from('booking_person');
+        $this->db->where('id', $booking_person_id);
+        $this->db->where('client_confirmation_status',0);
+        $this->db->where('appointment_method', 0);
+        $query = $this->db->get();
+        return $query->row();
+    }
+
+    public function update_booking_person($params,$booking_id)
+    {              
+        $this->db->where('id',$booking_id);
+        //$this->db->where('appointment_date',$appo_date_time);
+        return $this->db->update('booking_person',$params);        
+    }
+
+
+    public function add_queue($params)
+    {
+      $this->db->insert('queues',$params);
+    }
+
+
+  public function check_queue_exist($ad_id,$appo_date_time)
+    {           
+        $this->db->select('*');
+        $this->db->from('queues');
+        $this->db->where('ad_id', $ad_id);
+        $this->db->where('appointment_date', $appo_date_time);
+        $query = $this->db->get();
+        return $query->row();
+    }
+
+    public function update_queue($params,$ad_id,$appo_date_time){
+        $this->db->where('ad_id',$ad_id);
+        $this->db->where('appointment_date', $appo_date_time);;
+        return $this->db->update('queues',$params);
+    }
+
+    public function fetch_booking_person($ad_id,$appo_date_time)
+    {           
+        $this->db->select('*');
+        $this->db->from('booking_person');
+        $this->db->where('ad_id', $ad_id);
+        $this->db->where('appointment_date', $appo_date_time);
+        $this->db->where('queue_status', 1);
+        $this->db->where('client_confirmation_status',0);
+        $this->db->where('appointment_method', 0);
+        $query = $this->db->get();
+        return $query->result();
+    }
+
+    public function fetch_queue($ad_id,$appo_date_time)
+    {           
+        $this->db->select('*');
+        $this->db->from('queues');
+        $this->db->where('ad_id', $ad_id);
+        $this->db->where('appointment_date', $appo_date_time);
+        $query = $this->db->get();
+        return $query->row();
+    }
+
+    public function fetch_booking_person_queue_pos($ad_id,$appo_date_time)
+    {           
+        $this->db->select('*');
+        $this->db->from('booking_person');
+        $this->db->where('ad_id', $ad_id);
+        $this->db->where('appointment_date', $appo_date_time);
+        $this->db->where('queue_position', 1);
+        $this->db->where('client_confirmation_status',0);
+        $this->db->where('appointment_method', 0);
+        $query = $this->db->get();
+        return $query->result();
+    }
+    
+    public function fetch_booking_person_details($booking_person_id)
+    {           
+        $this->db->select('*');
+        $this->db->from('booking_person');
+        $this->db->where('id', $booking_person_id);
+        $this->db->where('appointment_method', 0);
+        $this->db->where('client_confirmation_status',0);
+        $this->db->where('appointment_method', 0);
+        $query = $this->db->get();
+        return $query->row();
+    }
+
+    public function mail($ad_id, $appo_date,$appo_time, $appo_date_time, $last_id, $booking_person_email,$booking_person_name){
+        $show_date= date("l, F j Y", strtotime($appo_date)) ;
+        $link_url=base_url('books/queue_link');
+        //echo date("d-m-Y", strtotime($originalDate));
+        // die;
+        $this->load->library('email');
+        $this->email->set_mailtype("html");
+        
+        $this->email->from('deepbn9@gmail.com', 'R.D.Barman');
+        $this->email->to($booking_person_email);        
+
+        $this->email->subject('Email Test');
+        $this->email->message('<h2>Appointment Confirmation:</h2>
+        <p>  Hi, </p>
+        <p> You have appointment with <strong>'.$booking_person_name.'</strong>.</p></br>
+        
+        <h3>When:</h3></br>
+        <p><strong> Date: </strong>'.$show_date.'</p></b>
+        <p><strong>Time: </strong>'.$appo_time.'</p></br>
+        
+        <p><h3>How to join:</h3> <a href="'.$link_url.'/'.$last_id.'/'.$ad_id.'?appo_date_time='.$appo_date_time.'">Click this Link</a> </p></br>       
+       
+        ');
+
+        $this->email->send();
+
+    }
+
+    public function add_live_queue($params){
+        $params = array_filter($params,'strlen');
+        $params ['created'] = date('Y-m-d H:i:s');
+        $params ['modified'] = date('Y-m-d H:i:s');
+        $this->db->insert('live_queue',$params);
+		return $this->db->insert_id();
+    }
+
+    
+
+}

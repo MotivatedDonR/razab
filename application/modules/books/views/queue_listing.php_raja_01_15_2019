@@ -1,0 +1,214 @@
+<div class="content-wrapper">
+    <!-- Content Hequeueer (Page hequeueer) -->
+    <section class="content-hequeueer">
+    </section>
+
+    <!-- Main content -->
+    <section class="content">
+
+        <!-- Default box -->
+        <div class="box">
+            <div class="box-hequeueer">
+                <h3 class="box-title">Guests In Queue Listing </h3>
+            </div>
+            <!-- /.box-hequeueer -->
+            <div class="box-body">
+                <table id="example1" class="table table-bordered table-striped">
+                    <thead>
+                        <tr>
+                            <th>Queue</th>
+                            <th>Booking Person Name</th>
+                            <th>Action</th>
+                            <th>Remove Queue</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php
+                    for ($x = 0; $x <$count; $x++) {     
+                                          
+                        ?>
+                        <tr>
+                            <td>
+                                Queue Name
+                                <?php echo $x+1; ?>
+                            </td>
+                            <td>
+                                <?php
+                                if($booking_person_count>=($x+1)){
+                                    if($booking_person_details){ 
+                                        echo $booking_person_details[$x]->booking_person_name;                   
+                                    } 
+                                }
+                                ?>
+                            </td>
+                            <td>
+                                <?php if(($x+1)==($queues+1)){    ?>                                
+                                    <button id="take_appo" queue_positon="<?php echo $x+1; ?>">Click To Take This Appointment</button>
+                                <?php } ?>
+                                <?php
+                                    if($booking_person_count==($x+1)){
+                                        $booking_person_name=$booking_person_details[$x]->booking_person_name;
+                                    }else{
+                                        $booking_person_name='';
+                                    }
+                                     
+                                ?>
+                                <input type="text" style="display:none" class="book_persons" value="<?php echo $booking_person_name; ?>" name="booking_person_name[]">
+                                <!-- <input type="text" style="display:none" name="queue_positon" value="<?php echo $x+1; ?>"> -->
+                            </td>
+                            <td>
+                                <?php if(($x+1)<($queues+1)){    ?>        
+                                    <?php
+                                        if($booking_person_count>=($x+1)){
+                                            if($booking_person_details){ 
+                                                //echo(($booking_person_details[$x])->id);  
+                                    ?>
+                                                <button id="remove_queue" class="remove_queue" booking_person_id="<?php  echo($booking_person_details[$x]->id); ?>" queue_positon="<?php echo $x+1; ?>">Remove From Queue</button>                                            
+                                    <?php                    
+                                            } 
+                                        } 
+                                    ?>                        
+                                    
+                                <?php } ?>
+                            </td>
+                        </tr>
+                        <?php
+                    }
+                    ?>
+                    
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <th>Queue</th>
+                            <th>Booking Person Name</th>
+                            <th>Action</th>
+                            <th>Remove Queue</th>
+                        </tr>
+                    </tfoot>
+                </table>
+                <input type="text" style="display:none" id="appo_date_time" value="<?php echo $appo_date_time; ?>" name="appo_date_time" >
+                <input type="text" style="display:none" value="<?php echo $ad_id; ?>" id="ad_id" name="ad_id" >
+                
+            </div>
+            <!-- /.box-body -->
+        </div>
+        <!-- /.box -->
+
+    </section>
+    <!-- /.content -->
+</div>
+
+
+
+<script>
+
+    $('.remove_queue').click(function () {
+        var booking_person_id = $(this).attr('booking_person_id');
+        var queue_position = $(this).attr('queue_positon');
+        var ad_id = $('input[name="ad_id"]').val();
+        var appo_date_time = $('input[name="appo_date_time"]').val();
+        var booking_person_names = [];
+
+        $('.book_persons').each(function(){
+            booking_person_names.push({ name: this.name, value: this.value }); 
+        });
+        //use values after the loop
+        // console.log(booking_person_names);
+
+        // console.log(queue_position);
+        // console.log(booking_person_id);
+        remove_queue(ad_id,appo_date_time,booking_person_id,queue_position,booking_person_names);
+    });
+
+
+    function remove_queue(ad_id,appo_date_time,booking_person_id,queue_position,booking_person_names){
+        
+        //console.log(ad_id);
+        
+        //return;
+        $.post("<?php echo base_url('books/remove_queue');?>", {
+                ad_id: ad_id,
+                appo_date_time: appo_date_time,
+                queue_position: queue_position,
+                booking_person_id: booking_person_id,
+                booking_person_names: booking_person_names
+            })
+            .done(function (data) {
+                //console.log(data);
+                location.reload();
+                //$('#show_date').append(data);
+
+            });
+    }
+
+    $('#take_appo').click(function () {
+        var booking_person_names = [];
+
+        $('.book_persons').each(function(){
+            booking_person_names.push({ name: this.name, value: this.value }); 
+        });
+        //use values after the loop
+        console.log(booking_person_names);
+        //var queue_positon = $('input[name="queue_positon"]').val();
+        var queue_position = $(this).attr('queue_positon');
+        var ad_id = $('input[name="ad_id"]').val();
+        var appo_date_time = $('input[name="appo_date_time"]').val();
+        set_queue(ad_id,appo_date_time,booking_person_names,queue_position);   
+        // console.log(booking_person_names); 
+        // console.log(queue_position);     
+        // console.log(ad_id); 
+        // console.log(appo_date_time); 
+    });
+
+
+    function set_queue(ad_id,appo_date_time,booking_person_names,queue_position){
+        
+        $.post("<?php echo base_url('books/publish_queue');?>", {
+                appo_date_time: appo_date_time,
+                booking_person_names: booking_person_names,
+                queue_position: queue_position,
+                ad_id: ad_id
+            })
+            .done(function (data) {
+                //console.log(data);
+                location.reload();
+
+            });
+    }
+
+    $('#example1').DataTable();
+
+    // $(document).requeuey(function () {
+    //     $(".del").click(function () {
+    //         if (!confirm("Do you want to delete")) {
+    //             return false;
+    //         }
+    //     });
+    // });
+
+    $('.compl').click(function () {
+        update_booking_person();
+    });
+
+    function update_booking_person() {
+
+        var ids = [];
+        $(':checkbox:checked').each(function (i) {
+            ids[i] = $(this).val();
+
+
+        });
+        $.post("<?php echo base_url('books/update_guest_list');?>", {
+                ids: ids
+            })
+            .done(function (data) {
+                console.log(data);
+                if (data == '1') {
+                    //$('#suc_msg').html('Updated Successfully');
+                    location.reload();
+                }
+
+            });
+
+    }
+</script>

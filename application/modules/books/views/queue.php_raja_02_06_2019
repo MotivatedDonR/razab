@@ -1,0 +1,108 @@
+<div class="content-wrapper">
+    <!-- Content Header (Page header) -->
+    
+
+    <!-- Main content -->
+    <section class="content">
+
+        <!-- Default box -->
+        <div class="box">
+            <!-- /.box-header -->
+            <div class="box-body">
+                <table id="example1" class="table table-bordered table-striped bord" >
+                    <thead>
+                    <tr>
+                        
+                    </tr>
+                    </thead>
+                    <tbody>
+                        <th><div class="que_pos">
+                        <?php
+                        if(!$booking_person_detail){
+                            echo" Queue Is Closed For You...";
+                         }else{
+                        if($queue_pos){
+                            echo "Your Position in the Queue is ".$queue_pos;
+                        }else{
+
+                        
+                         if($cnt>0 && $cnt<5 ){
+                             if($value_present!=''){
+                                 echo" Queue Is Full";
+                             }else{
+                        ?>
+                        You are number <?php  echo $cnt; ?> in Queue
+                        <?php 
+                            }
+                        }
+                        else{  
+                            ?>
+                        The Queue Has not started Yet!
+                        <?php  } } } ?>
+                        </div></th>
+                    </tbody>
+                    <tfoot>
+                    <tr>
+                        
+                    </tr>
+                    </tfoot>
+                </table>
+            </div>
+            <!-- /.box-body -->
+        </div>
+        <!-- /.box -->
+        <div class="box">
+            <!-- /.box-header -->
+            <div class="box-body">
+                <table id="example1" class="table table-bordered table-striped bord" >
+                    <tbody>
+                    <?php 
+                        if($booking_person_detail){
+                        if(!$queue_pos){
+                        if($cnt>0 && $cnt<5 ){
+                        if($value_present==''){
+                            
+                        ?>
+                        <th><div class="join"><a href="<?php echo base_url().'books/confirm_booking/'.$booking_person_id.'/'.$cnt.'?appo_date_time='.$appo_date_time;?>">Click Here To Join</a></div></th>
+                    <?php 
+                        } } } }?>
+                    </tbody>
+                </table>
+            </div>
+            <!-- /.box-body -->
+        </div>
+    </section>
+    <!-- /.content -->
+</div>
+
+
+
+<script>
+    //$('#example1').DataTable();
+
+    $(document).ready(function(){
+        setTimeout(function() {
+            location.reload();
+        }, 5000);
+
+        $(".del").click(function(){
+            if (!confirm("Do you want to delete")){
+                return false;
+            }
+        });
+    });
+
+
+</script>
+
+<style>
+.bord{    border: 1px solid #090a0a;}
+.que_pos{ padding: 50px 4px; text-align: center;}
+.join{  padding: 50px 4px; text-align: center;}
+
+.testimonials {   padding-top: 1rem;    padding-bottom: 1rem; }
+footer.footer {padding-top: 1rem;    padding-bottom: 1rem; }
+table#example1 {width:100%}
+.content-wrapper{ width:100%;}
+body{background-color: #f8f9fa!important; min-height:100vh;}
+</style>

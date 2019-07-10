@@ -1,0 +1,12 @@
+DirectoryIndex index.php
+RewriteEngine on
+ 
+RewriteCond %{SERVER_PORT} 80 
+RewriteRule ^(.*)$ https://easyhealthlink.livinglinks.city [L,R=301]
+
+RewriteBase /
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^(.*)$ ./index.php?$1 [L,QSA]
+	
+  

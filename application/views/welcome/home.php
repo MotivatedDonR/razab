@@ -1,0 +1,868 @@
+
+<header>
+    <div class="row">
+        <div class="col-md-2 col-sm-12 col-xs-12 nopadd">
+            <div class="logo">
+                <h3><a href="<?php echo base_url(); ?>">
+                        <?php echo $title; ?></a></h3><h6 style="font-weight: bold;color: <?php echo $site_description_color?> !important;">
+                    <?php echo $site_description;?></h6>
+            </div>
+        </div>
+
+        <div class="col-md-10 col-sm-12 col-xs-7 otherspart">
+            <div class="allformarear">
+                <form class="form-horizontal row" action="" method="post">
+                    <div class="col-md-2 nopadd col-auto ">
+
+                        <select class="form-control seller" id="category_id" name="category_id">
+                            <option value="0">Category</option>
+                            <?php
+                            foreach ($category_names as $category_name) { ?>
+                            <option value="<?php echo $category_name->id; ?>">
+                                <?php echo $category_name->name; ?>
+                            </option>
+                            <?php }
+                            ?>
+
+                        </select>
+
+                    </div>
+                    <div class=" col-auto col-md-3 form-group sel_req_all">
+                        <input type="radio" name="choose" class="minimal seller gender" value="seller" id="seller">
+                        <?php echo $site_filter_option1_label;?>
+                        <input type="radio" name="choose" class="minimal seller gender" value="reqeustor" id="reqeustor">
+                        <?php echo $site_filter_option2_label;?>
+                        <input type="radio" name="choose" class="minimal seller " value="all" id="reqeustor" checked>
+                        <?php echo $site_filter_option_no_filter_label;?>
+                    </div>
+                    <div class="col-auto col-md-3 col-sm-4 nopadd">
+                        <div class="input-group">
+                            <input type="text" class="form-control " id="search_product1" placeholder="Search ">
+                            <div class="input-group-append">
+                                <button id="search_btn" class="btn btn-outline-secondary" type="button"><i style="padding-right:10px;"
+                                        class="fa fa-search" aria-hidden="true"></i></button>
+                            </div>
+
+                        </div>
+                    </div>
+
+
+
+
+                    <div class="col-auto col-md-2 col-sm-8 nopadd">
+                        <label class="sr-only" for="inlineFormInputGroup">City</label>
+                        <div class="input-group mb-2">
+                            <div class="input-group-prepend">
+                                <div class="input-group-text"><span class="fa fa-map-marker-alt"></span></div>
+                            </div>
+                            <input type="text" class="form-control" id="inlineFormInputGroup" placeholder="View Another City or Country">
+                        </div>
+                    </div>
+
+                    
+                            <?php 
+                        $query = "SELECT * FROM `singup`";
+                         $data = $this->db->query($query);
+                        $x  =  $data->result_array();                       
+                        $y =  $x[0]['value'];
+                        if($y==1){ ?>
+                
+                    <div class="col-md-2 col-auto ">
+                        <a href="<?php echo base_url('index.php/users/auth'); ?>" class="btn btn-success "><i class="fa fa-sign-in-alt"
+                                style="padding-right:10px;"></i>
+                            <?php if($this->session->userdata('logged_in')){?> My Profile
+                            <?php }else{ ?>Signin
+                            <?php }?></a>
+
+                    </div>
+                <?php } ?>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+    </div>
+
+
+</header>
+<div class="fullwidth"></div>
+<div id="googleMap"></div>
+<div class="footer-home">
+    <ul class="list-inline">
+        <?php
+        foreach ($pages as $page) {
+            ?>
+        <a href="<?php echo base_url('page/') . $page->permalink; ?>" class="list-inline-item">
+            <?php echo $page->title; ?></a>
+        <?php
+        }
+        ?>
+    </ul>
+</div>
+
+<!-- Modal -->
+<div class="modal" id="msgmodal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Send Message</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form>
+                    <div class="form-group">
+                        <label for="name" class="col-form-label">Name:</label>
+                        <input type="text" class="form-control" id="name" name="name">
+                    </div>
+                    <div class="form-group">
+                        <label for="email" class="col-form-label">Email:</label>
+                        <input type="text" class="form-control" id="email" name="email">
+                    </div>
+                    <div class="form-group">
+                        <label for="message" class="col-form-label">Message:</label>
+                        <textarea class="form-control" id="message" name="message"></textarea>
+                    </div>
+                    <input type="hidden" name="user_id" id="user_id">
+                    <input type="hidden" name="store_id" id="store_id">
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" id="msg-btn" class="btn btn-primary">Send Message</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- Modal -->
+
+<div class="modal" id="msgreportmodal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Report This Ad</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form>
+
+                    <div class="form-group">
+                        <label for="message" class="col-form-label">Reason:</label>
+                        <textarea class="form-control" id="reportmessage" name="message"></textarea>
+                    </div>
+                    <input type="hidden" name="user_id" id="report_user_id">
+                    <input type="hidden" name="ads_id" id="ads_id">
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" id="msg-reports-ad" class="btn btn-primary">Report</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Modal -->
+<div class="modal" id="flyer_modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document" style="overflow-y: initial !important">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">View Flyers</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body" id="flyer_modal_body" style="height: 250px;overflow-y: auto;">
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- Modal -->
+<div class="modal" id="flyer_gallery" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Flyer Gallery</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body" id="gallery-flyer">
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://maps.googleapis.com/maps/api/js?sensor=false&key=AIzaSyCet9hQUKvNJTA_BHuJosRS1zeYnCpWHGc&libraries=places&callback=initMap"
+    async></script>
+<script src="<?php echo base_url();?>assets/vendors/geolocation-marker.js" async defer></script>
+<script>
+    var infowindow;
+    var autocomplete;
+    var map;
+    var markers = [];
+    $('#findLocation').click(function () {
+        var place = autocomplete.getPlace();
+
+        if (place.geometry) {
+            map.panTo(place.geometry.location);
+            map.setZoom(12);
+        } else {
+            document.getElementById('inlineFormInputGroup').placeholder = 'Enter a city';
+        }
+    });
+
+
+    function onPlaceChanged() {
+
+        var place = autocomplete.getPlace();
+        if (place.geometry) {
+            map.panTo(place.geometry.location);
+            map.setZoom(12);
+        } else {
+            document.getElementById('inlineFormInputGroup').placeholder = 'Enter a city';
+        }
+    }
+
+    function getMapData(category = 0, selected = 0, search_product = 0) {
+        //alert(category);
+        //return alert(selected);
+        DeleteMarkers();
+        $.getJSON('<?php echo base_url('welcome/getStoresJson');?>', {
+            category: category,
+            selected: selected,
+            search_product: search_product
+        }, function (data) {
+            console.log(data);
+            var locations = [];
+            data.forEach(function (elem) {
+                var temp = {};
+                var verified = '0';
+                <?php if($balloon){ ?>
+                if (elem.verified) {
+                    temp.icon = 'https://maps.google.com/mapfiles/ms/icons/green-dot.png';
+                    verified = '(<strong style="color:#1bb71b;">Certified</strong>)';
+                } else {
+                    temp.icon = 'https://maps.google.com/mapfiles/ms/icons/red-dot.png'
+                }
+                
+                <?php } else{?>
+                if (elem.verified) {
+                   // temp.icon = 'https://www.iconsdb.com/icons/preview/green/info-3-xxl.png';
+                   temp.icon = '<?php echo base_url().'uploads/images/red.png'?>';
+                    verified = '(<strong style="color:#1bb71b;">Certified</strong>)';
+                } else {
+                    //temp.icon = 'https://www.iconsdb.com/icons/preview/red/info-3-xxl.png'
+                    temp.icon = '<?php echo base_url().'uploads/images/green.png'?>';
+                }               
+                <?php }?>
+
+                var documents = '';
+                /*
+                                elem.docs.forEach(function (doc) {
+                                    documents += '<li><a target="_blank" href="<?php echo base_url('uploads/documents/')?>' + doc.file_name + '">View / Download</a></li>';
+                });
+                if (elem.docs.length > 0) {
+                    documents = '<br/><div class="docs" style="width: 45%;float: left;"><strong style="color:#b732b7;">View Certifications</strong><ul>' + documents + '</ul></div>';
+                }*/
+                
+                
+                var weblink1 = "";
+                var weblink2 = "";
+                var weblink3 = "";
+
+                var video_link = "";
+                var v_link='';
+                var booking_link ="";
+                var live_queue ="";
+                /*if(elem.web_link!=""){
+                  weblink = '<a target="_blank" href="'+elem.web_link+'"><strong>Website</strong></a><br/>'
+                }*/
+                
+                 
+
+                var galleryy = "";
+                video = elem.video;
+                //console.log(typeof(elem.ad_image));
+                if (elem.ad_image) {
+                    galleryy = elem.ad_image;
+                    var galleryArray = galleryy.split("#");
+                    //console.log(galleryArray.length);
+                    var imagesDiv = '';
+                    galleryArray.forEach(function (image, index) {
+                        //console.log('index=' + index);
+                        var classes = '';
+                        var classes2 = "gallery";
+                        if (index === 0) {
+                            classes = "carousel-item active";
+                        } else {
+                            classes = "carousel-item";
+                        }
+                        
+                        /*imagesDiv += '<div class="' + classes +'"><a class="classes2" href="./uploads/documents/' + image + '"><img src="./uploads/documents/' + image + '" alt="Los Angeles" style="width: 100%; height: 290px"></a></div>'*/
+                        
+                        imagesDiv += '<div class="' + classes +'"><a class="demo" data-lightbox="gallery" href="./uploads/documents/' + image + '"><img src="./uploads/documents/' + image + '" alt="Los Angeles" style="width: 100%; height: 200px;"></a></div>'
+                        
+                    });
+                    }
+                    var carousel ='';
+                    //console.log(elem.ad_image);
+                    if (elem.ad_image) 
+                    {   
+                     carousel = '<div id="demo" style= "width: 50%;height: 200px; margin:0px; float:left;" class="carousel slide" data-ride="carousel">\n' +
+                        '  \n' +
+                        '  <!-- The slideshow -->\n' +
+                        '  <div class="carousel-inner">\n' +
+                        imagesDiv + 
+                        '  </div>\n' +
+                        '  \n' +
+                        '  <!-- Left and right controls -->\n' +
+                        '  <a class="carousel-control-prev" href="#demo" data-slide="prev">\n' +
+                        '    <span class="carousel-control-prev-icon"></span>\n' +
+                        '  </a>\n' +
+                        '  <a class="carousel-control-next" href="#demo" data-slide="next">\n' +
+                        '    <span class="carousel-control-next-icon"></span>\n' +
+                        '  </a>\n' +
+                        '</div>';
+                    }
+                    
+                    if(elem.show_hide_web_link != 0){
+                        if ((elem.web_link_1 != "") && (elem.show_hide_weblink_1 != 0)) {
+                            weblink1 = '<a target="_blank" href="' + elem.web_link_1 + '"><strong>' + elem.weblink_1_text + '</strong></a><br/>'
+                        }
+                        
+                        if ((elem.web_link_2 != "") && (elem.show_hide_weblink_2 != 0)) {
+                            weblink2 = '<a target="_blank" href="' + elem.web_link_2 + '"><strong>' + elem.weblink_2_text + '</strong></a><br/>'
+                        }
+
+                        if ((elem.web_link_3 != "") && (elem.show_hide_weblink_3 != 0)) {
+                            weblink3 = '<a target="_blank" href="' + elem.web_link_3 + '"><strong>' + elem.weblink_3_text + '</strong></a><br/>'
+                        }   
+                    }  
+                    if(elem.video_link_link){
+                         v_link='<table><tr><td><img height="100" width="150" src="' + elem.video_link_image + '"></td><td class="video_link"><div class="video_link_title">' + elem.video_link_title + '</div><br><div>' + elem.video_link_description + '</div></td></tr></table>';
+
+                        video_link='<a target="_blank" href="' + elem.video_link_link + '"><strong>' + v_link + '</strong></a><br/>'
+                    } 
+                    if(elem.verified){
+                        var book_link="<?php echo base_url();?>books/appointment";
+
+                        booking_link='<a class="btn btn-success btn-sm" target="_blank" href="' + book_link +'/'+ elem.user_id +'/'+elem.ad_id+'"><strong> Book Appoinment</strong></a>'
+                        if(elem.live_queue_status=="1"){
+                            var live_queue_link="<?php echo base_url();?>books/live_queue";
+
+                            live_queue='<a  class="btn btn-success btn-sm" target="_blank" style="margin-left: 10px;" href="' + live_queue_link +'/'+ elem.user_id +'/'+elem.ad_id+'"><strong> Live Queue</strong></a><br/>'
+                        }
+                    }
+                
+                
+                
+                
+                var video = '';
+                if(elem.video){
+                    video = '<div id="mymapvideo" style="width:48%; margin-left:2%; float:right;">'+
+                        '<video width="320" height="300" controls src="<?php echo base_url();?>'+
+                        'uploads/videos/'+elem.video+'">'+
+                        '</video>'  +                   
+                        '</div>';
+                    
+                    
+                }
+                
+
+                var flyers = "";
+                //video = elem.video;
+                if (elem.flyer_expiry) {
+                    flyer_exp = new Date(elem.flyer_expiry);
+                    flyers = '<div class="flyers" style="float: right;margin-left: 50px"><a href="javascript:view_flyer(' + elem.user_id + ');" ><strong style="color:#b732b7;">View Flyer</strong></a><p>Expiry Date: ' + flyer_exp.toISOString().split('T')[0] + '</p></div>';
+                }
+                var price = "";
+                /* if ((elem.price !=0) && (elem.price !=null) ) {
+                        price = '<h6 style="display:inline-block">Price:</h6> <strong>'+ elem.price + '</strong>'
+                    } */
+
+
+                if(elem.choose == "reqeustor"){
+                    if((elem.price !=0) && (elem.price !=null)){
+                         price = '<h6 style="display:inline-block">Price:</h6> <strong>'+ elem.price + '</strong>'
+                    }
+                     else{
+                        price = '<h6 style="display:inline-block">Price:</h6> <strong>N/A</strong>'
+                    } 
+                }else{
+                    if(elem.hide_ad_price==0){
+                        if((elem.price !=0) && (elem.price !=null)){
+                            price = '<h6 style="display:inline-block">Price:</h6> <strong>'+ elem.price + '</strong>'
+                        }
+                         else{
+                            price = '<h6 style="display:inline-block">Price:</h6> <strong>N/A</strong>'
+                        } 
+
+                    }   
+                } 
+                
+                
+                
+
+                temp.info = '<div style="width:45%"><h4><strong style="color:blue">' + elem.adtitle + '</strong><small>' + verified + '</small></h4></div><div style="float:right" class="mylogoonbx "><img class="prof_img" src="<?php echo base_url('uploads/profile_pictures/');?>'+elem.image+'" height="120" width="120"/></div><br>\
+                <h6 style="display:inline-block"><?php echo $advertiser_name_label;?>:</h6> <strong>'+ elem.advertiser_name + '</strong><br>\
+                <h6 style="display:inline-block"><?php echo $advertiser_description_label;?>:</h6> <strong>'+ elem.description + '</strong><br>\
+              '+booking_link+live_queue+'<br>\
+                <h6 style="display:inline-block">Address:</h6> <strong>'+ elem.my_address + '</strong><br>\
+                <h6 style="display:inline-block"><i class="fa fa-phone"></i></h6>+ <strong>'+ elem.advertiser_phone + '</strong><br>\
+                <h6 style="display:inline-block"><i class="fas fa-fax"></i></h6>+ <strong>'+ elem.fax + '</strong><br>\<a style="padding-right:10px;" href="javascript:sendMessage(' + elem.user_id + ',' + elem.id + ');"><img src="<?php echo base_url() . 'uploads/images/chat-icon.png';?>" width="25" height="25"/></a><br/> '+price+'<br>\
+              '+video_link+'<br>\
+              ' + elem.address.substr(0, 70) + '<br>\
+              <a href="https://www.google.com/maps/dir//' + elem.lat +','+ elem.lng + '" class="btn btn-secondary btn-sm" target="_blank"><i class="fa fa-map-marker"></i> Get Direction</a><br/><br/>'+  documents + flyers + carousel +video+'<br/><div class="clearfix"></div><a style="clear:both; display:block; margin-top:15px;" href="javascript:sendreportMessage(' + elem.id + ');"><strong>Report This Ad.<strong/></a>';
+                temp.lat = elem.lat;
+                temp.long = elem.lng;
+
+                locations.push(temp);
+            })
+
+            setMarkers(locations);
+            //
+        });
+    }
+    
+    //Default Call Filter on Page Load 
+    $(document).ready(function () {
+        filter();
+    });
+
+    //Seller / Requester / Category Filter
+    $("input[type='radio'],#category_id").change(function () {
+        filter();
+    });
+
+    //Search Filter
+    $('#search_btn').click(function () {
+        filter();
+    });
+
+    $( "#search_product1" ).keypress(function(e) {
+        if (event.keyCode === 13) {
+            filter();
+        }
+    });
+    
+    //Finally Filter the Results
+    function filter() {
+        var category_id = $("#category_id").val();
+        var selected = $(".gender:checked").val();
+        var search_product = $("#search_product").val();
+        //alert(search_product);
+        getMapData(category_id, selected, search_product);
+    }
+
+    //Initializing the Map
+    function initMap() {
+
+        var options = {
+            types: ['(cities)']
+        };
+
+        var input = document.getElementById('inlineFormInputGroup');
+        autocomplete = new google.maps.places.Autocomplete(input, options);
+        autocomplete.addListener('place_changed', onPlaceChanged);
+
+
+        map = new google.maps.Map(document.getElementById('googleMap'), {
+            zoom: 12,
+            center: new google.maps.LatLng(41.976816, -87.659916),
+            mapTypeId: google.maps.MapTypeId.ROADMAP
+        });
+
+        infowindow = new google.maps.InfoWindow({});
+
+        getMapData();
+        
+
+        // Try HTML5 geolocation.
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(function (position) {
+                var pos = {
+                    lat: position.coords.latitude,
+                    lng: position.coords.longitude
+                };
+
+                infowindow.setPosition(pos);
+                infowindow.setContent('Location found.');
+                map.setCenter(pos);
+                var GeoMarker = new GeolocationMarker(map);
+            }, function () {
+                handleLocationError(true, infowindow, map.getCenter());
+            });
+        } else {
+            // Browser doesn't support Geolocation
+            handleLocationError(false, infowindow, map.getCenter());
+        }
+
+
+    }
+
+
+    var markersArr = [];
+
+
+    function setMarkers(locations) {
+        //setMapOnAll(null);
+        for (i = 0; i < locations.length; i++) {
+
+            var marker = new google.maps.Marker({
+                position: new google.maps.LatLng(locations[i].lat, locations[i].long),
+                animation: google.maps.Animation.DROP,
+                icon: locations[i].icon,
+                map: map
+            });
+
+            markersArr.push(marker);
+
+            google.maps.event.addListener(marker, 'click', (function (marker, i) {
+                return function () {
+                    infowindow.setContent('<div style="width:500px" class="mymaigsg">' + locations[i].info + '</div>');
+                    infowindow.open(map, marker);
+                }
+            })(marker, i));
+            markers.push(marker);
+        }
+    }
+
+
+    function DeleteMarkers() {
+        //Loop through all the markers and remove
+        for (var i = 0; i < markers.length; i++) {
+            markers[i].setMap(null);
+        }
+        markers = [];
+    };
+
+
+    function handleLocationError(browserHasGeolocation, infoWindow, pos) {
+        infoWindow.setPosition(pos);
+        infoWindow.setContent(browserHasGeolocation ?
+            'Error: The Geolocation service failed.' :
+            'Error: Your browser doesn\'t support geolocation.');
+    }
+
+    function clearOverlays() {
+        if (marker) {
+            for (i in marker) {
+                marker[i].setMap(null);
+            }
+        }
+    }
+
+
+    function sendMessage(user_id,store_id) {
+        var name = $('#name').val('');
+        var email = $('#email').val('');
+        var message = $('#message').val('');
+        //var user_id = $('#user_id').val('');
+        $('#msg-btn').html('Send Message');
+        $('#user_id').val(user_id);
+        $('#store_id').val(store_id);
+        $('#msgmodal').modal();
+    }
+    
+    function sendreportMessage(ads_id) {
+        
+        $('#reportmessage').val('');
+        $('#msg-reports-ad').html('Report');
+        $('#ads_id').val(ads_id);
+        $('#msgreportmodal').modal();
+    }
+    
+    /*function adGallery(ad_id) {
+       //alert('hi');
+       $('#ad_id').val(ad_id);
+        //alert(ad_id);
+       $.get("<?php echo base_url ('welcome/AdGalery');?>", {
+           
+            ad_id: ad_id
+        });
+    }*/
+    
+    
+    
+    
+
+    $('#msg-btn').click(function () {
+        $('#msg-btn').html('Sending...');
+        var name = $('#name').val();
+        var email = $('#email').val();
+        var message = $('#message').val();
+        var user_id = $('#user_id').val();
+        var store_id = $('#store_id').val();
+        $.post("<?php echo base_url('welcome/sendmail');?>", {
+            name: name,
+            email: email,
+            message: message,
+            user_id: user_id,
+            store_id: store_id
+        })
+            .done(function (data) {
+                if (data =='1') {
+                    $('#msg-btn').html('Message Sent');
+                    alert('Message Sent');
+                    $('#msgmodal').modal('hide');
+                }
+
+            });
+
+    });
+    
+    
+    
+     $('#msg-reports-ad').click(function () {
+        $('#msg-reports-ad').html('Sending...');
+        
+        var message = $('#reportmessage').val();
+        //alert(message);
+        var ads_id = $('#ads_id').val();
+        //return alert(ads_id);
+        $.post("<?php echo base_url('welcome/reportsAd');?>", {
+            
+            message: message,
+            ads_id: ads_id
+        })
+            .done(function (data) {
+                if (data == '1') {
+                    $('#msg-reports-ad').html('Message Sent');
+                    alert('Message Sent');
+                    $('#msgreportmodal').modal('hide');
+                }
+
+            });
+
+    });
+
+
+    function view_flyer(user_id) {
+
+        $.get('<?php echo base_url('welcome/getFlyersByUserId')?>', {user_id: user_id})
+            .done(function (data) {
+                $('#flyer_modal_body').html(data);
+                $('#flyer_modal').modal('show');
+            })
+
+
+    }
+
+
+    function getFlyerGallery(flyer_id) {
+        $.get('<?php echo base_url('welcome/getFlyerGallery/')?>' + flyer_id)
+            .done(function (data) {
+                $('#gallery-flyer').html(data);
+                $('#flyer_gallery').modal('show');
+            });
+
+    }
+    
+    
+
+
+</script>
+
+
+<style type="text/css">
+    .modal-backdrop {
+        background-color: #00000082 !important;
+    }
+
+    #flyer_gallery .modal-dialog {
+        width: 830px;
+        max-width: 830px;
+    }
+
+    .logo {
+        margin-top: -10px;
+        /* max-height: 60px; */
+    }
+
+    @media only screen and (max-width: 768px) {
+        .logo {
+            text-align: center;
+            margin-top: -10px;
+            max-height: 80px;
+        }
+
+        .logo img {
+            display: inline-block;
+        }
+
+        .otherspart {
+            text-align: center;
+        }
+
+        header .col-auto {
+            -webkit-box-flex: 1;
+            -ms-flex: 1 1 auto;
+            flex: 1 1 auto;
+        }
+    }
+</style>
+
+
+
+<link rel="stylesheet" href="<?php echo base_url();?>assets/lightbox2/dist/css/lightbox.min.css">
+
+<script src="<?php echo base_url();?>assets/lightbox2/dist/js/lightbox.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.0/jquery.min.js"></script>
+
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+ 
+        <script>
+            
+
+             /*
+                    look up autocomplete
+
+             */
+ //$(function () {
+    // $("#search_product").autocomplete({  
+    //     minLength:1, 
+    //      delay:0,    
+    //     source:'<?php //echo  //site_url('welcome/lookup'); ?>', 
+    //     select:function(event, ui){
+    //         $('#siteid').val(ui.item.siteid);
+    //         $('#sitename').val(ui.item.sitename);
+    //         }
+    //     });
+    // });
+    $(function(){
+  $("#search_product1").autocomplete({
+    source: "welcome/get_birds", // path to the get_birds method
+      // select:function(event, ui){
+      //       $('#siteid').val(ui.item.siteid);
+      //       $('#sitename').val(ui.item.sitename);
+      //       }
+  });
+});
+</script>
+<style type="text/css">
+    .gallery ul {
+        margin: 0px;
+        padding: 0px;
+    }
+
+    .gallery ul li {
+        list-style: none;
+        display: inline-block;
+        margin: 5px;
+        border: 1px solid #000;
+    }
+
+    @media only screen and (max-width: 500px) {
+        .mymaigsg {
+            width: 260px !important;
+        }
+
+        #demo img {
+            height: 150px !important;
+        }
+
+        .mymaigsg .btn {
+            margin: 15px 0;
+        }
+    }
+</style>
+
+<script>
+    /*
+    $(function(){
+        var $gallery = $('.galler a').simpleLightbox();
+
+        $gallery.on('show.simplelightbox', function(){
+            console.log('Requested for showing');
+        })
+            .on('shown.simplelightbox', function(){
+                console.log('Shown');
+            })
+            .on('close.simplelightbox', function(){
+                console.log('Requested for closing');
+            })
+            .on('closed.simplelightbox', function(){
+                console.log('Closed');
+            })
+            .on('change.simplelightbox', function(){
+                console.log('Requested for change');
+            })
+            .on('next.simplelightbox', function(){
+                console.log('Requested for next');
+            })
+            .on('prev.simplelightbox', function(){
+                console.log('Requested for prev');
+            })
+            .on('nextImageLoaded.simplelightbox', function(){
+                console.log('Next image loaded');
+            })
+            .on('prevImageLoaded.simplelightbox', function(){
+                console.log('Prev image loaded');
+            })
+            .on('changed.simplelightbox', function(){
+                console.log('Image changed');
+            })
+            .on('nextDone.simplelightbox', function(){
+                console.log('Image changed to next');
+            })
+            .on('prevDone.simplelightbox', function(){
+                console.log('Image changed to prev');
+            })
+            .on('error.simplelightbox', function(e){
+                console.log('No image found, go to the next/prev');
+                console.log(e);
+            });
+    });
+    */
+</script>
+<style>
+    #mymapvideo video {
+        width: 100%;
+        height: 100%;
+    }
+</style>
+
+
+<?php  
+if($seller_requestor_all){
+?>
+<style>
+    .sel_req_all {
+        display: none;
+    }
+</style>
+<?php 
+}
+?>
+
+
+<style>
+    .prof_img {
+        margin-right: 15px;
+    }
+
+    .video_link_title {
+        color: #151414;
+        font-size: 15px;
+    }
+
+    .video_link {
+        padding-left: 18px;
+        padding-bottom: 7px;
+    }
+</style>

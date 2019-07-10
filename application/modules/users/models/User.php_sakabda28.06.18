@@ -1,0 +1,288 @@
+<?php
+defined('BASEPATH') OR exit('No direct script access allowed');
+
+
+class User extends CI_Model
+{
+    private $table = 'users';
+
+    public function __construct()
+    {
+        parent::__construct();
+        $this->load->library('form_validation');
+        $this->form_validation->CI =& $this;
+    }
+
+    public function get_documents_by_user_id($user_id)
+    {   
+        $this->db->select('*');
+        $this->db->from('documents');
+        $this->db->where('user_id',$user_id);
+        $this->db->order_by('timestamp','DESC');
+        $query = $this->db->get();
+        return $query->result();
+    }
+
+
+    public function get_images($user_id)
+    {   
+        
+        $this->db->select('*');
+        $this->db->from('galleries');
+        $this->db->where('user_id',$user_id);
+        $this->db->order_by('timestamp','DESC');
+        $query = $this->db->get();
+        return $query->result();
+    }
+
+
+    public function get_users($certificate)
+    {
+        $this->db->select('users.*');
+        $this->db->select('user_roles.role_name as role');
+        $this->db->from('users');
+        $this->db->join('user_roles', 'user_roles.id = users.user_role');
+        $this->db->where('users.user_role != 1');
+        if($certificate=="active"){
+            $this->db->where("users.certificate_expiry >='".date('Y-m-d')."'");    
+        }
+        if($certificate=="expired"){
+            $this->db->where("users.certificate_expiry <'".date('Y-m-d')."'");    
+        }        
+        $query = $this->db->get();
+        return $query->result();
+    }
+
+    public function get_administrator()
+    {
+        $this->db->select('users.*');
+        $this->db->select('user_roles.role_name as role');
+        $this->db->from('users');
+        $this->db->join('user_roles', 'user_roles.id = users.user_role');
+        $this->db->where('users.user_role', 1);
+        $query = $this->db->get();
+        return $query->result();
+    }
+
+
+    public function fetch_user($id)
+    {
+        $condition['id'] = $id;
+        $query = $this->db->get_where($this->table, $condition);
+        $result = $query->row();
+        if ($result) {
+            return $result;
+        }
+        return false;
+    }
+
+    public function get_user($email)
+    {
+        $this->db->where('email', $email);
+        $this->db->select('u.*,r.role_name as type');
+        $this->db->from($this->table . ' u');
+        $this->db->join('user_roles r', 'u.user_role=r.id');
+        $query = $this->db->get();
+        $result = $query->row();
+        if ($result) {
+            return $result;
+        }
+        return false;
+    }
+
+    public function update_user($id, $params)
+    {
+        // $this->db->select('image');
+        // $this->db->from($this->table);
+        // $this->db->where('id', $id);
+        // $img = $this->db->get()->row();
+        // $image = json_decode(json_encode($img), True);
+        // $str = implode(" ", $image);
+        // if (isset($params['image'])) {
+        //     unlink('./uploads/users_pictures/' . $str);
+        // }
+        $params = array_filter($params, 'strlen');
+        $params['modified'] = date('Y-m-d H:i:s');
+        $this->db->where('id', $id);
+        return $this->db->update($this->table, $params);
+    }
+
+  
+    public function get_user_roles()
+    {   
+        
+        $this->db->select('*');
+        $this->db->from('user_roles');
+        $this->db->where('status', 1);
+        $query = $this->db->get();
+        return $query->result();
+    }
+
+ 
+    public function add_user($params)
+    {
+        $params['password'] = $this->hash_password($params['password']);
+        $params = array_filter($params, 'strlen');
+        $this->db->insert($this->table, $params);
+    }
+
+    public function add_documents($datas){
+        $this->db->insert('documents', $datas);
+    }
+    
+    public function add_image($gal)
+    {
+       
+       
+        $this->db->insert('galleries', $gal);
+    }
+
+    private function hash_password($password)
+    {
+        return password_hash($password, PASSWORD_BCRYPT);
+    }    
+
+    public function delete_user($id)
+    {
+        $condition['id'] = $id;
+        $query = $this->db->get_where($this->table, $condition);
+        $image = $query->row('image');
+        unlink('./uploads/users_pictures/' . $image);
+        return $this->db->delete($this->table, array('id' => $id));
+    }    
+
+    public function image_upload($name)
+    {
+        $config['upload_path'] = './uploads/users_pictures/';
+        $config['allowed_types'] = 'gif|jpg|png';
+        $config['max_size'] = 1024;
+        $config['file_name'] = time();
+        if (!is_writable($config['upload_path'])) {
+            chmod($config['upload_path'], 777);
+        }
+        $this->load->library('upload', $config);
+        if (!$this->upload->do_upload($name)) {
+            $ret['status'] = false;
+            $ret['error'] = $this->upload->display_errors();
+        } else {
+            $data = $this->upload->data();
+            $ret['status'] = true;
+            $ret['file_name'] = $data['file_name'];
+        }
+        return $ret;
+    } 
+
+
+    public function document_upload($name)
+    {
+        $config['upload_path'] = './uploads/documents/';
+        $config['allowed_types'] = 'png|pdf|doc|docx|jpeg|jpg';
+        //$config['max_size'] = 102400;
+        $config['file_name'] = time();
+        if (!is_writable($config['upload_path'])) {
+            chmod($config['upload_path'], 777);
+        }
+        $this->load->library('upload', $config);
+        if (!$this->upload->do_upload($name)) {
+            $ret['status'] = false;
+            $ret['error'] = $this->upload->display_errors();
+        } else {
+            $data = $this->upload->data();
+            $ret['status'] = true;
+            $ret['file_name'] = $data['file_name'];
+        }
+        return $ret;
+    }  
+
+
+
+    public function toggle_status($id)
+    {
+        $this->db->set('status', '1-status', FALSE);
+        $this->db->where('id', $id);
+        return $this->db->update($this->table);
+    }
+
+
+
+    public function toggle_photo_status($id)
+    {
+        $this->db->set('verified', '1-verified', FALSE);
+        $this->db->where('id', $id);
+        return $this->db->update('galleries');
+    }
+
+
+    public function update_photo_comment($comment,$photo_id){
+        $this->db->set('comment',$comment);
+        $this->db->where('id',$photo_id);
+        return $this->db->update('galleries');
+    }
+
+    /**     * @return bool     * Validation function */
+    public function verify_validation()
+    {
+        $action = $this->router->method;
+        if ($action == 'add') {
+            $this->form_validation->set_rules('first_name', 'First Name', 'trim|required');
+            $this->form_validation->set_rules('last_name', 'Last Name', 'trim|required');
+            $this->form_validation->set_rules('email', 'Email', 'trim|required|valid_email|is_unique[users.email]');
+            $this->form_validation->set_rules('phone', 'Phone', 'trim|required|min_length[10]|max_length[10]');
+            $this->form_validation->set_rules('password', 'Password', 'trim|required');
+            $this->form_validation->set_rules('cpassword', 'Confirm Password', 'trim|required|matches[password]');
+            $this->form_validation->set_rules('user_role', 'User Role', 'trim|required');
+        }
+        if ($action == 'edit') {
+            $this->form_validation->set_rules('first_name', 'First Name', 'trim|required');
+            $this->form_validation->set_rules('last_name', 'Last Name', 'trim|required');
+            $this->form_validation->set_rules('email', 'Email', 'trim|required|callback_email_check');
+            $this->form_validation->set_rules('phone', 'Phone', 'trim|required|min_length[10]|max_length[15]');
+            $this->form_validation->set_rules('user_role', 'User Role', 'trim|required');
+        }
+        if ($action == 'profile') {
+            
+            $this->form_validation->set_rules('first_name', 'First Name', 'trim|required');
+            $this->form_validation->set_rules('last_name', 'Last Name', 'trim|required');
+            $this->form_validation->set_rules('email', 'Email', 'trim|required|callback_email_check');
+            $this->form_validation->set_rules('phone', 'Phone', 'trim|required|min_length[10]|max_length[15]');
+            //$this->form_validation->set_rules('user_role', 'User Role', 'trim|required');
+            //echo"enetted";
+            //die;
+        }
+        if ($this->form_validation->run() == FALSE) {
+            return FALSE;
+        } else {
+            return TRUE;
+        }
+    }
+
+    public function username_check($username)
+    {
+        $old_username = $this->input->post('old_username');
+        if ($username == $old_username) {
+            return true;
+        }
+        $query = $this->db->get_where('users', array('username' => $username));
+        $row = $query->row();
+        if ($row) {
+            $this->form_validation->set_message('username_check', 'Username should be unique');
+            return false;
+        }
+        return true;
+    }
+
+    public function email_check($email)
+    {
+        $old_email = $this->input->post('old_email');
+        if ($email == $old_email) {
+            return true;
+        }
+        $query = $this->db->get_where('users', array('email' => $email));
+        $row = $query->row();
+        if ($row) {
+            $this->form_validation->set_message('email_check', 'Email should be unique');
+            return false;
+        }
+        return true;
+    }
+}

@@ -1,0 +1,103 @@
+<div class="content-wrapper">
+    <!-- Content Header (Page header) -->
+    <section class="content-header">
+      <h1>
+        Add New Store
+        <small>Fill up the form bellow</small>
+      </h1>
+      <ol class="breadcrumb">
+        <li><a href="#"><i class="fa fa-dashboard"></i> Home</a></li>
+        <li><a href="#">Stores</a></li>
+        <li class="active">Add</li>
+      </ol>
+    </section>
+
+    <!-- Main content -->
+    <section class="content">
+
+      <!-- Default box -->
+        <div class="box box-info">
+            <div class="box-header with-border">
+                <h3 class="box-title">Store Add</h3>
+            </div>
+            <?php echo form_open(current_url()); ?>
+            <div class="box-body">
+                <div class="row clearfix">
+
+                    <div class="col-md-6">
+                        <label for="name" class="control-label"><span class="text-danger">*</span>Name</label>
+                        <div class="form-group">
+                            <input type="text" name="name" value="<?php echo $this->input->post('name'); ?>" class="form-control" id="name" />
+                            <span class="text-danger"><?php echo form_error('name');?></span>
+                        </div>
+                    </div>
+                     <div class="col-md-6">
+                        <label for="address" class="control-label"><span class="text-danger">*</span>Address</label>
+                        <div class="form-group">
+                            <input type="text" name="address" value="<?php echo $this->input->post('address'); ?>" class="form-control" id="address" />
+                            <span class="text-danger"><?php echo form_error('address');?></span>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="region" class="control-label"><span class="text-danger">*</span>Region</label>
+                        <div class="form-group">
+                            <input type="text" name="region" value="<?php echo $this->input->post('region'); ?>" class="form-control" id="region" />
+                            <span class="text-danger"><?php echo form_error('region');?></span>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="city" class="control-label"><span class="text-danger">*</span>City</label>
+                        <div class="form-group">
+                            <input type="text" name="city" value="<?php echo $this->input->post('city'); ?>" class="form-control" id="city" />
+                            <span class="text-danger"><?php echo form_error('city');?></span>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="state" class="control-label"><span class="text-danger">*</span>State</label>
+                        <div class="form-group">
+                            <input type="text" name="state" value="<?php echo $this->input->post('state'); ?>" class="form-control" id="state" />
+                            <span class="text-danger"><?php echo form_error('state');?></span>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="country" class="control-label"><span class="text-danger">*</span>Country</label>
+                        <div class="form-group">
+                            <input type="text" name="country" value="<?php echo $this->input->post('country'); ?>" class="form-control" id="country" />
+                            <span class="text-danger"><?php echo form_error('country');?></span>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="postal_code" class="control-label"><span class="text-danger">*</span>Postal Code</label>
+                        <div class="form-group">
+                            <input type="text" name="postal_code" value="<?php echo $this->input->post('postal_code'); ?>" class="form-control" id="postal_code" />
+                            <span class="text-danger"><?php echo form_error('postal_code');?></span>
+                        </div>
+                    </div>
+                    
+
+                   
+                  
+                     <div class="col-md-3">
+                        <label for="status" class="control-label">Status</label>
+                        <div class="form-group">
+                        <input type="radio" name="status" class="minimal" value="1" id="status">Active
+                        <input type="radio" name="status" class="minimal" value="0" id="status" checked>Inactive
+                            
+                            <span class="text-danger"><?php echo form_error('status');?></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="box-footer">
+                <button type="submit" class="btn btn-success">
+                    <i class="fa fa-check"></i> Save
+                </button>
+            </div>
+            <?php echo form_close(); ?>
+        </div>
+      <!-- /.box -->
+
+    </section>
+    <!-- /.content -->
+  </div>
+

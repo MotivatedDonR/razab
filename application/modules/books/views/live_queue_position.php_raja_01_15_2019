@@ -1,0 +1,104 @@
+<div class="content-wrapper">
+    <!-- Content Header (Page header) -->
+    
+
+    <!-- Main content -->
+    <section class="content">
+
+        <!-- Default box -->
+        <div class="box">
+            <!-- /.box-header -->
+            <div class="box-body">
+                <table id="example1" class="table table-bordered table-striped bord" >
+                    <thead>
+                    <tr>
+                        
+                    </tr>
+                    </thead>
+                    <tbody>
+                        <th><div class="que_pos">
+                        <?php  
+                        if($booking_person_status){
+                            if($queue_position){
+                                echo" Your Position In Live Queue is:" .$queue_position;
+                                echo'<br>';
+                                echo "Your Approximate Waiting Time Is:  " .$utimate_time;
+                                echo'<br>';
+                                ?>
+                                <?php if($queue_position==1){?>
+                                <?php if($show_hide_weblink_1){
+                                    if(($ads->web_link_1)&&($ads->web_link_1_show_hide)){                                    
+                                    ?>
+                                    <a target="_blank" href="<?php echo $ads->web_link_1;?>"><strong><?php  echo $weblink_1_text;?></strong></a>
+                                <?php }
+                                }
+                                ?>
+                                <?php if($show_hide_weblink_2){
+                                    if(($ads->web_link_2)&&($ads->web_link_2_show_hide)){                                    
+                                    ?>
+                                    &nbsp;|&nbsp;&nbsp;<a target="_blank" href="<?php echo $ads->web_link_2;?>"><strong><?php  echo $weblink_2_text;?></strong></a>
+                                <?php }
+                                }
+                                ?>
+                                <?php if(($show_hide_weblink_3)&&($ads->web_link_3_show_hide)){
+                                    if($ads->web_link_3){                                    
+                                    ?>
+                                    &nbsp;|&nbsp;&nbsp;<a target="_blank" href="<?php echo $ads->web_link_3;?>"><strong><?php  echo $weblink_3_text;?></strong></a>
+                                <?php }
+                                }
+                                ?>
+                                <?php }?>
+                        <?php
+                            } 
+                        }else{
+                            echo" You Have Completed Appointment";
+                        }
+                          
+                       ?>
+                        </div></th>
+                    </tbody>
+                    <tfoot>
+                    <tr>
+                        
+                    </tr>
+                    </tfoot>
+                </table>
+            </div>
+            <!-- /.box-body -->
+        </div>
+        <!-- /.box -->
+    </section>
+    <!-- /.content -->
+</div>
+
+
+
+<script>
+    //$('#example1').DataTable();
+
+    $(document).ready(function(){
+        // setTimeout(function() {
+        //     location.reload();
+        // }, 5000);
+
+        $(".del").click(function(){
+            if (!confirm("Do you want to delete")){
+                return false;
+            }
+        });
+    });
+
+
+</script>
+
+<style>
+.bord{    border: 1px solid #090a0a;}
+.que_pos{ padding: 165px 4px; text-align: center;}
+.join{  padding: 50px 4px; text-align: center;}
+
+.testimonials {   padding-top: 1rem;    padding-bottom: 1rem; }
+footer.footer {padding-top: 1rem;    padding-bottom: 1rem; }
+table#example1 {width:100%}
+.content-wrapper{ width:100%;}
+body{background-color: #f8f9fa!important; min-height:100vh;}
+</style>

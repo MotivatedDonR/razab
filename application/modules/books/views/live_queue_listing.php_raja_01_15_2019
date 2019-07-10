@@ -1,0 +1,231 @@
+<div class="content-wrapper">
+    <!-- Content Hequeueer (Page hequeueer) -->
+    <section class="content-hequeueer">
+    </section>
+
+    <!-- Main content -->
+    <section class="content">
+
+        <!-- Default box -->
+        <div class="box">
+            <div class="box-hequeueer">
+                <h3 class="box-title">Guests In Live Queue Listing </h3>
+            </div>
+            <!-- /.box-hequeueer -->
+            <div class="box-body">
+                <table id="example1" class="table table-bordered table-striped">
+                    <thead>
+                        <tr>
+                            <th>Index</th>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Number</th>
+                            <th>Weblinks</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php
+                        $index_cnt=0;
+                        $link_cnt=0;
+                    foreach ($live_queue_details as $live_queue_detail) {
+                        $index_cnt++;
+                        $status_class = 'danger';
+                        $status_text = 'Inactive';
+                        if ($live_queue_detail->status){
+                            $status_class = 'success';
+                            $status_text = 'Active';
+                        }
+                         
+                        ?>
+                        <tr>
+                            <td>
+                                <?php echo $index_cnt; ?>
+                            </td>
+                            <td>
+                                <?php echo $live_queue_detail->booking_person_name; ?>
+                            </td>
+                            <td>
+                                <?php echo $live_queue_detail->booking_person_email; ?>
+                            </td>
+                            <td>
+                                <?php echo $live_queue_detail->booking_person_number; ?>
+                            </td>
+                            <td>
+                                <?php 
+                                if($live_queue_detail->status=="0"){ 
+                                    $link_cnt++;
+                                }
+                                if($link_cnt==1){ ?>
+                                    <?php if($show_hide_weblink_1){
+                                        if(($ads->web_link_1)&&($ads->web_link_1_show_hide) ){                                    
+                                        ?>
+                                        <a target="_blank" href="<?php echo $ads->web_link_1;?>"><strong><?php  echo $weblink_1_text;?></strong></a>
+                                    <?php }
+                                    }
+                                    ?>
+                                    <?php if($show_hide_weblink_2){
+                                        if(($ads->web_link_2)&&($ads->web_link_2_show_hide)){                                    
+                                        ?>
+                                        &nbsp;|&nbsp;<a target="_blank" href="<?php echo $ads->web_link_2;?>"><strong><?php  echo $weblink_2_text;?></strong></a>
+                                    <?php }
+                                    }
+                                    ?>
+                                    <?php if($show_hide_weblink_3){
+                                        if(($ads->web_link_3)&&($ads->web_link_3_show_hide)){                                    
+                                        ?>
+                                        &nbsp;|&nbsp;<a target="_blank" href="<?php echo $ads->web_link_3;?>"><strong><?php  echo $weblink_3_text;?></strong></a>
+                                    <?php }
+                                    }
+                                    ?>
+                                <?php } ?>
+                            </td>
+                            <td>
+                                <?php if($live_queue_detail->status=="0"){ 
+                                ?>
+                                    <button  class=" btn btn-danger btn-sm complete_appo" booking_person_id="<?php  echo $live_queue_detail->id; ?>">Complete it!</button> 
+                                <?php }else{ ?>
+                                    <div  class=" btn btn-success btn-sm disabled">Completed</div> 
+                                <?php } ?>
+                            </td>
+                        </tr>
+                        <?php
+                    }
+                    ?>
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <th>Index</th>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Number</th>
+                            <th>Weblinks</th>
+                            <th>Status</th>
+                        </tr>
+                    </tfoot>
+                </table>
+                
+            </div>
+            <!-- /.box-body -->
+        </div>
+        <!-- /.box -->
+
+    </section>
+    <!-- /.content -->
+</div>
+
+
+
+<script>
+    $('.complete_appo').click(function () {
+        //alert("dffd");
+        //$(this).closest('.complete_appo').append('<div>tere</div>');
+
+
+        if ($(this).text() === 'Complete it!') {
+                $(this).text('Completed');
+               $(this).removeClass( "btn btn-danger btn-sm complete_appo" ).addClass( "btn btn-success btn-sm" );
+               $(this).prop('disabled', true);
+        }
+        else {
+            $(this).text('Completed');
+        }
+
+        var booking_person_id = $(this).attr('booking_person_id');
+        console.log(booking_person_id);
+        //return
+        
+        complete_appo(booking_person_id);
+    });
+
+
+    function complete_appo(booking_person_id) {
+
+        //console.log(ad_id);
+
+        //return;
+        $.post("<?php echo base_url('books/update_live_queue_status');?>", {
+                booking_person_id: booking_person_id
+            })
+            .done(function (data) {
+                console.log(data);
+                //location.reload();
+                //$('#show_date').append(data);
+
+            });
+    }
+
+    $('#take_appo').click(function () {
+        var booking_person_names = [];
+
+        $('.book_persons').each(function () {
+            booking_person_names.push({
+                name: this.name,
+                value: this.value
+            });
+        });
+        //use values after the loop
+        console.log(booking_person_names);
+        //var queue_positon = $('input[name="queue_positon"]').val();
+        var queue_position = $(this).attr('queue_positon');
+        var ad_id = $('input[name="ad_id"]').val();
+        var appo_date_time = $('input[name="appo_date_time"]').val();
+        set_queue(ad_id, appo_date_time, booking_person_names, queue_position);
+        // console.log(booking_person_names); 
+        // console.log(queue_position);     
+        // console.log(ad_id); 
+        // console.log(appo_date_time); 
+    });
+
+
+    function set_queue(ad_id, appo_date_time, booking_person_names, queue_position) {
+
+        $.post("<?php echo base_url('books/publish_queue');?>", {
+                appo_date_time: appo_date_time,
+                booking_person_names: booking_person_names,
+                queue_position: queue_position,
+                ad_id: ad_id
+            })
+            .done(function (data) {
+                //console.log(data);
+                location.reload();
+
+            });
+    }
+
+    $('#example1').DataTable();
+
+    // $(document).requeuey(function () {
+    //     $(".del").click(function () {
+    //         if (!confirm("Do you want to delete")) {
+    //             return false;
+    //         }
+    //     });
+    // });
+
+    $('.compl').click(function () {
+        update_booking_person();
+    });
+
+    function update_booking_person() {
+
+        var ids = [];
+        $(':checkbox:checked').each(function (i) {
+            ids[i] = $(this).val();
+
+
+        });
+        $.post("<?php echo base_url('books/update_guest_list');?>", {
+                ids: ids
+            })
+            .done(function (data) {
+                console.log(data);
+                if (data == '1') {
+                    //$('#suc_msg').html('Updated Successfully');
+                    location.reload();
+                }
+
+            });
+
+    }
+</script>
